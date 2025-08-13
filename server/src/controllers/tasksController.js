@@ -1,8 +1,20 @@
 import Task from "../models/Task.js";
 
 async function getAllTasks(req, res) {
-  const tasks = await Task.getAllTasks();
-  res.json(tasks);
+  try {
+    const filters = {};
+    if (req.query.date) {
+      filters.date = req.query.date;
+    }
+    if (req.query.status) {
+      filters.status = req.query.status;
+    }
+
+    const tasks = await Task.getAllTasks(filters);
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({ error: error.message});
+  }
 }
 
 async function getTaskById(req, res) {
@@ -24,18 +36,18 @@ async function updateTask(req, res) {
     if (!req.body) {
       return res
         .status(400)
-        .json({ error: "Missing required fields. Must include title or status." });
+        .json({
+          error: "Missing required fields. Must include title or status.",
+        });
     }
     if (req.body.title !== undefined) {
       await Task.updateTaskTitle(req.params.id, req.body.title);
     }
     if (req.body.status !== undefined) {
       if (!statuses.includes(req.body.status)) {
-        return res
-          .status(400)
-          .json({
-            error: `Invalid status. Must be one of ${statuses.join(", ")}`,
-          });
+        return res.status(400).json({
+          error: `Invalid status. Must be one of ${statuses.join(", ")}`,
+        });
       }
       await Task.updateTaskStatus(req.params.id, req.body.status);
     }

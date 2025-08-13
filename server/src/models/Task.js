@@ -1,7 +1,27 @@
 import pool from "./pool.js";
 
-async function getAllTasks() {
-  const { rows } = await pool.query("SELECT * FROM tasks");
+async function getAllTasks(filters = {}) {
+  let query = "SELECT * FROM tasks";
+  const values = []
+  const conditions = []
+
+  if (filters.date) {
+    conditions.push(`task_date = $${values.length + 1}`);
+    values.push(filters.date);
+  }
+
+  if (filters.status) {
+    conditions.push(`status = $${values.length + 1}`);
+    values.push(filters.status);
+  }
+
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ")
+  }
+
+  query += " ORDER BY created_at ASC"
+
+  const { rows } = await pool.query(query, values);
   return rows;
 }
 

@@ -1,18 +1,22 @@
 import { useState, useEffect } from "react";
 import TaskItem from "./TaskItem";
+import NewTaskItem from "./NewTaskItem";
 
 function TaskList({ selectedDate }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  console.log("TaskList rendering, data:", data);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchTasks = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:3000/tasks");
+        const selectedDateQuery = selectedDate.toISOString().split("T")[0];
+        const response = await fetch(
+          `http://localhost:3000/tasks?date=${selectedDateQuery}`
+        );
         const data = await response.json();
-        console.log(data);
         setData(data);
       } catch (error) {
         setError(error.message);
@@ -21,16 +25,37 @@ function TaskList({ selectedDate }) {
       }
     };
 
-    fetchData();
-  }, []);
+    fetchTasks();
+  }, [selectedDate]);
+
+  const refreshTasks = async () => {
+    try {
+      setLoading(true);
+      const selectedDateQuery = selectedDate.toISOString().split("T")[0];
+      const response = await fetch(
+        `http://localhost:3000/tasks?date=${selectedDateQuery}`
+      );
+      const data = await response.json();
+      setData(data);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) return <div>Loading Tasks...</div>;
   if (error) return <div>Error: {error}</div>;
 
   const taskItems = data.map((task) => {
-    return <TaskItem key={task.id} task={task} />;
+    return <TaskItem key={task.id} task={task} onTaskDeleted={refreshTasks}/>;
   });
-  return <div>{taskItems}</div>;
+  return (
+    <div>
+      {taskItems}
+      <NewTaskItem selectedDate={selectedDate} onTaskAdded={refreshTasks}/>
+    </div>
+  );
 }
 
 export default TaskList;
