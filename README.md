@@ -23,7 +23,7 @@ A simple daily task management app. Tasks are associated with a day, allowing yo
 
 ## Demo
 
-*TODO: Add demo*
+https://github.com/user-attachments/assets/c7a7d6ca-e7c6-4ce3-b8f5-1c96b32d614c
 
 ## Installation
 
