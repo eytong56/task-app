@@ -1,14 +1,9 @@
 import { useState } from "react";
-import Header from "./components/Header";
-import TaskList from "./components/TaskList";
+import Container from "./components/Container";
 import ArrowNav from "./components/ArrowNav";
-import JumpToToday from "./components/JumpToToday";
 
 function App() {
-  const [selectedDate, setSelectedDate] = useState(
-    new Date()
-    // new Date("2025-05-25T07:00:00Z")
-  );
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   return (
     <div className="flex justify-center">
@@ -17,10 +12,10 @@ function App() {
         setSelectedDate={setSelectedDate}
         direction={-1}
       />
-      <div className="flex-grow flex flex-col items-center max-w-200 min-w-150 gap-10 py-24 px-24">
-        <Header selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
-        <TaskList selectedDate={selectedDate} />
-      </div>
+      <Container
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
+      />
       <ArrowNav
         selectedDate={selectedDate}
         setSelectedDate={setSelectedDate}

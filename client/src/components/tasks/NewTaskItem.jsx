@@ -1,24 +1,24 @@
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import TaskItemContainer from "./TaskItemContainer";
 
 function NewTaskItem({ selectedDate, onTaskAdded }) {
   const [title, setTitle] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  // console.log("NewTaskItem rendering, title:", title);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleChange = (e) => {
+  const handleChangeTitle = (e) => {
     setTitle(e.target.value);
   };
 
   const handleAddTask = async () => {
+    // Don't add task with empty title
     if (!title.trim()) {
-      // Don't add empty task
       return;
     }
 
     try {
-      setIsSubmitting(true);
-      const selectedDateQuery = selectedDate.toISOString().split("T")[0];
+      setSubmitting(true);
+      const selectedDateString = selectedDate.toISOString().split("T")[0];
       const response = await fetch("http://localhost:3000/tasks", {
         method: "POST",
         headers: {
@@ -26,45 +26,66 @@ function NewTaskItem({ selectedDate, onTaskAdded }) {
         },
         body: JSON.stringify({
           title: title.trim(),
-          date: selectedDateQuery,
+          date: selectedDateString,
         }),
       });
+
       if (!response) {
         throw new Error("Failed to create new task");
       }
+
       const newTask = await response.json();
       console.log(newTask);
-      setTitle("");
+
+      setTitle(""); // Reset title
+      // TODO: Add new task without refreshing
       if (onTaskAdded) {
-        onTaskAdded();
+        onTaskAdded(); // Refresh all tasks
       }
     } catch (error) {
       console.log(`Error creating new task: ${error}`);
-      // TODO: Show error to client
+      setError(error);
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
+  // Allow submit on enter
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
       e.target.blur();
     }
   };
 
+  if (submitting) {
+    return (
+      <TaskItemContainer>
+        <span className="text-neutral-300">Adding...</span>
+      </TaskItemContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <TaskItemContainer>
+        <span className="text-red-800">Error: {error}</span>
+      </TaskItemContainer>
+    );
+  }
+
   return (
-    <div className="flex w-full justify-start items-center gap-6 px-6 py-3 border-1 border-neutral-300 rounded-full bg-white hover:shadow-sm focus:shadow-sm focus-within:border-neutral-500 transition-all duration-300">
+    <TaskItemContainer>
       <input
         type="text"
         value={title}
         placeholder="Add a new task..."
-        onChange={handleChange}
-        disabled={isSubmitting}
+        onChange={handleChangeTitle}
+        disabled={submitting}
         onBlur={handleAddTask}
         onKeyDown={handleKeyDown}
         className="focus:outline-none w-full"
       />
-    </div>
+    </TaskItemContainer>
   );
 }
 

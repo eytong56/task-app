@@ -3,31 +3,31 @@ import TaskItem from "./TaskItem";
 import NewTaskItem from "./NewTaskItem";
 
 function TaskList({ selectedDate }) {
-  const [data, setData] = useState(null);
+  const [tasks, setTasks] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  console.log("TaskList rendering, data:", data);
 
+  // Retrieve tasks for selectedDate (initial)
   useEffect(() => {
     const fetchTasks = async () => {
       try {
         setLoading(true);
-        const selectedDateQuery = selectedDate.toISOString().split("T")[0];
+        const selectedDateString = selectedDate.toISOString().split("T")[0];
         const response = await fetch(
-          `http://localhost:3000/tasks?date=${selectedDateQuery}`
+          `http://localhost:3000/tasks?date=${selectedDateString}`
         );
         const data = await response.json();
-        setData(data);
+        setTasks(data);
       } catch (error) {
         setError(error.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchTasks();
   }, [selectedDate]);
 
+  // Refresh tasks (for when tasks are updated)
   const refreshTasks = async () => {
     try {
       setLoading(true);
@@ -36,7 +36,7 @@ function TaskList({ selectedDate }) {
         `http://localhost:3000/tasks?date=${selectedDateQuery}`
       );
       const data = await response.json();
-      setData(data);
+      setTasks(data);
     } catch (error) {
       setError(error.message);
     } finally {
@@ -44,16 +44,27 @@ function TaskList({ selectedDate }) {
     }
   };
 
-  if (loading) return <div className="flex items-center text-xl font-semibold text-neutral-400">Loading Tasks...</div>;
-  if (error) return <div className="flex items-center text-xl font-semibold text-red-800">Error: {error}</div>;
+  if (loading)
+    return (
+      <div className="flex items-center text-xl font-medium text-neutral-400">
+        Loading Tasks...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="flex items-center text-xl font-medium text-red-800">
+        Error: {error}
+      </div>
+    );
 
-  const taskItems = data.map((task) => {
-    return <TaskItem key={task.id} task={task} onTaskDeleted={refreshTasks}/>;
+  const taskItems = tasks.map((task) => {
+    return <TaskItem key={task.id} task={task} onTaskDeleted={refreshTasks} />;
   });
+
   return (
-    <div className="flex flex-col gap-3 w-full">
+    <div className="flex flex-col gap-2 w-full">
       {taskItems}
-      <NewTaskItem selectedDate={selectedDate} onTaskAdded={refreshTasks}/>
+      <NewTaskItem selectedDate={selectedDate} onTaskAdded={refreshTasks} />
     </div>
   );
 }
