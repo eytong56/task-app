@@ -1,12 +1,15 @@
 import { useState } from "react";
 import STATUSES from "../constants/statuses";
+import { Circle, Triangle, Check, ArrowRight, X } from "lucide-react";
 
 function TaskItem({ task, onTaskDeleted }) {
   // console.log('TaskItem rendering for task:', task.id);
+  const [latestTask, setLatestTask] = useState(task);
   const [title, setTitle] = useState(task.title);
   const [status, setStatus] = useState(task.status);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleDelete = async () => {
     try {
@@ -27,28 +30,28 @@ function TaskItem({ task, onTaskDeleted }) {
       }
     } catch (error) {
       console.log(`Error deleting task: ${error}`);
-      // TODO: Show error to client
+      setError(error);
     } finally {
       setIsDeleting(false);
     }
-  };
-
-  const handleSwitchMode = () => {
-    setIsEditing(true);
   };
 
   const handleChange = (e) => {
     setTitle(e.target.value);
   };
 
-  const handleUpdateTitle = async (e) => {
-    e.preventDefault();
-    if (!title.trim()) {
-      // Don't update task to empty
+  const handleUpdateTitle = async () => {
+    // if (isUpdating) {
+    //   return;
+    // }
+    if (!title.trim() || title.trim() === latestTask.title) {
+      // Don't update task if empty or same as before
+      setTitle(latestTask.title);
       return;
     }
 
     try {
+      setIsUpdating(true);
       const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
         method: "PUT",
         headers: {
@@ -63,23 +66,30 @@ function TaskItem({ task, onTaskDeleted }) {
       }
       const updatedTask = await response.json();
       console.log(updatedTask);
+      setLatestTask(updatedTask);
       setTitle(updatedTask.title);
     } catch (error) {
       console.log(`Error updating task: ${error}`);
+      setError(error);
       // TODO: Show error to client
     } finally {
-      setIsEditing(false);
+      setIsUpdating(false);
     }
   };
 
-  const editTitleMode = (
-    <form onSubmit={handleUpdateTitle}>
-      <input type="text" value={title} onChange={handleChange} />
-    </form>
-  );
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.target.blur();
+    }
+  };
 
   const handleChangeStatus = (newStatus) => async () => {
+    // if (isUpdating) {
+    //   return;
+    // }
     try {
+      setIsUpdating(true);
+      setStatus(newStatus);
       const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
         method: "PUT",
         headers: {
@@ -94,39 +104,63 @@ function TaskItem({ task, onTaskDeleted }) {
       }
       const updatedTask = await response.json();
       console.log(updatedTask);
-      setStatus(updatedTask.status);
+      setLatestTask(updatedTask);
     } catch (error) {
+      setStatus(latestTask.status); // If error, reverse the status to be consistent with db
       console.log(`Error updating task: ${error}`);
+      setError(error);
       // TODO: Show error to client
     } finally {
-      //
+      setIsUpdating(false);
     }
   };
 
+  const setIconColor = (iconStatus) => {
+    return (
+      "cursor-pointer transition-all duration-300 " +
+      (status !== iconStatus ? "text-neutral-200 " : "")
+    );
+  };
+
   return (
-    <div className="flex">
-      <div>
-        <span onClick={handleChangeStatus(STATUSES.PENDING)} className="cursor-pointer">P</span>
-        <span onClick={handleChangeStatus(STATUSES.IN_PROGRESS)} className="cursor-pointer">IP</span>
-        <span onClick={handleChangeStatus(STATUSES.COMPLETED)} className="cursor-pointer">C</span>
-        <span onClick={handleChangeStatus(STATUSES.PUSHED)} className="cursor-pointer">{"->"}</span>
-        {status}
+    <div className="flex w-full justify-start items-center gap-6 px-6 py-3 border-1 border-neutral-300 rounded-full bg-white hover:shadow-sm focus:shadow-sm focus-within:border-neutral-500 transition-all duration-300">
+      <div className="flex gap-1">
+        <Circle
+          onClick={handleChangeStatus(STATUSES.PENDING)}
+          className={setIconColor(STATUSES.PENDING) + " text-gray-500"}
+          disabled={isUpdating}
+        />
+        <Triangle
+          onClick={handleChangeStatus(STATUSES.IN_PROGRESS)}
+          className={setIconColor(STATUSES.IN_PROGRESS) + "text-amber-500"}
+          disabled={isUpdating}
+        />
+        <Check
+          onClick={handleChangeStatus(STATUSES.COMPLETED)}
+          className={setIconColor(STATUSES.COMPLETED) + "text-emerald-500"}
+          disabled={isUpdating}
+        />
+        <ArrowRight
+          onClick={handleChangeStatus(STATUSES.PUSHED)}
+          className={setIconColor(STATUSES.PUSHED) + "text-blue-500"}
+          disabled={isUpdating}
+        />
       </div>
-      {!isEditing ? (
-        <div onClick={handleSwitchMode}>{title}</div>
-      ) : (
-        editTitleMode
-      )}
-      <div>{task.task_date}</div>
-      <div>
-        <button
-          onClick={handleDelete}
-          disabled={isDeleting}
-          className="cursor-pointer"
-        >
-          delete
-        </button>
+      <div className="grow">
+        <input
+          type="text"
+          value={title}
+          onChange={handleChange}
+          onBlur={handleUpdateTitle}
+          onKeyDown={handleKeyDown}
+          className="focus:outline-none w-full"
+        />
       </div>
+      <X
+        onClick={handleDelete}
+        disabled={isDeleting}
+        className="justify-self-end w-4 h-4 cursor-pointer hover:text-neutral-400 transition-colors duration-300"
+      />
     </div>
   );
 }

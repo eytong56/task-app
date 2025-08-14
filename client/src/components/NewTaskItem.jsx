@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Plus } from "lucide-react";
 
 function NewTaskItem({ selectedDate, onTaskAdded }) {
   const [title, setTitle] = useState("");
@@ -9,8 +10,7 @@ function NewTaskItem({ selectedDate, onTaskAdded }) {
     setTitle(e.target.value);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleAddTask = async () => {
     if (!title.trim()) {
       // Don't add empty task
       return;
@@ -33,7 +33,7 @@ function NewTaskItem({ selectedDate, onTaskAdded }) {
         throw new Error("Failed to create new task");
       }
       const newTask = await response.json();
-      console.log(newTask)
+      console.log(newTask);
       setTitle("");
       if (onTaskAdded) {
         onTaskAdded();
@@ -46,22 +46,25 @@ function NewTaskItem({ selectedDate, onTaskAdded }) {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.target.blur();
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
+    <div className="flex w-full justify-start items-center gap-6 px-6 py-3 border-1 border-neutral-300 rounded-full bg-white hover:shadow-sm focus:shadow-sm focus-within:border-neutral-500 transition-all duration-300">
       <input
         type="text"
         value={title}
+        placeholder="Add a new task..."
         onChange={handleChange}
         disabled={isSubmitting}
+        onBlur={handleAddTask}
+        onKeyDown={handleKeyDown}
+        className="focus:outline-none w-full"
       />
-      <button
-        type="submit"
-        className="cursor-pointer"
-        disabled={isSubmitting || !title.trim()}
-      >
-        {isSubmitting ? "Adding..." : "+"}
-      </button>
-    </form>
+    </div>
   );
 }
 

@@ -51,7 +51,7 @@ function TaskList({ selectedDate }) {
     return <TaskItem key={task.id} task={task} onTaskDeleted={refreshTasks}/>;
   });
   return (
-    <div>
+    <div className="flex flex-col gap-3 w-full">
       {taskItems}
       <NewTaskItem selectedDate={selectedDate} onTaskAdded={refreshTasks}/>
     </div>
