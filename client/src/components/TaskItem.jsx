@@ -115,34 +115,36 @@ function TaskItem({ task, onTaskDeleted }) {
     }
   };
 
-  const setIconColor = (iconStatus) => {
+  const getIconColor = (iconStatus) => {
     return (
       "cursor-pointer transition-all duration-300 " +
       (status !== iconStatus ? "text-neutral-200 " : "")
     );
   };
 
+  const titleClasses = status === STATUSES.COMPLETED ? " text-neutral-400 line-through" : status === STATUSES.PUSHED ? " text-neutral-400" : ""
+
   return (
     <div className="flex w-full justify-start items-center gap-6 px-6 py-3 border-1 border-neutral-300 rounded-full bg-white hover:shadow-sm focus:shadow-sm focus-within:border-neutral-500 transition-all duration-300">
       <div className="flex gap-1">
         <Circle
           onClick={handleChangeStatus(STATUSES.PENDING)}
-          className={setIconColor(STATUSES.PENDING) + " text-gray-500"}
+          className={getIconColor(STATUSES.PENDING) + " text-gray-500"}
           disabled={isUpdating}
         />
         <Triangle
           onClick={handleChangeStatus(STATUSES.IN_PROGRESS)}
-          className={setIconColor(STATUSES.IN_PROGRESS) + "text-amber-500"}
+          className={getIconColor(STATUSES.IN_PROGRESS) + "text-amber-500"}
           disabled={isUpdating}
         />
         <Check
           onClick={handleChangeStatus(STATUSES.COMPLETED)}
-          className={setIconColor(STATUSES.COMPLETED) + "text-emerald-500"}
+          className={getIconColor(STATUSES.COMPLETED) + "text-emerald-500"}
           disabled={isUpdating}
         />
         <ArrowRight
           onClick={handleChangeStatus(STATUSES.PUSHED)}
-          className={setIconColor(STATUSES.PUSHED) + "text-blue-500"}
+          className={getIconColor(STATUSES.PUSHED) + "text-blue-500"}
           disabled={isUpdating}
         />
       </div>
@@ -153,7 +155,7 @@ function TaskItem({ task, onTaskDeleted }) {
           onChange={handleChange}
           onBlur={handleUpdateTitle}
           onKeyDown={handleKeyDown}
-          className="focus:outline-none w-full"
+          className={"focus:outline-none w-full transition-all duration-300" + titleClasses}
         />
       </div>
       <X
