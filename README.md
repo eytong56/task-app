@@ -4,12 +4,14 @@ A simple daily task management app. Tasks are associated with a day, allowing yo
 
 *Last updated: 8/13/2025*
 
-## Tech Stack
+## Details
+
+### Tech Stack
 **Frontend:** React (with Tailwind CSS)
 
 **Backend:** Node.js, Express.js, PostgreSQL
 
-## Current Features
+### Current Features
 
 - Single user 
 - View current time and date
@@ -22,6 +24,29 @@ A simple daily task management app. Tasks are associated with a day, allowing yo
 ## Demo
 
 *TODO: Add demo*
+
+## Installation
+
+Use the npm package manager to install dependencies.
+
+```bash
+npm install
+```
+
+You will also need to add a `./server/.env` file with `PORT` and `DATABASE_URL` variables to run the server and establish the database connection.
+
+Once your database is connected, use the following command to initialize and seed the database.
+```bash
+npm run db:init
+```
+
+## Usage
+
+```bash
+npm run dev # run both server and client
+npm run server # run only server
+npm run client # run only client 
+```
 
 ## Next Steps
 
