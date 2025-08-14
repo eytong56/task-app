@@ -27,7 +27,7 @@ function TaskItem({ task, onTaskDeleted }) {
         },
       });
       if (!response) {
-        throw new Error("Failed to delete task");
+        throw new Error(`Failed to delete task! Status: ${response.status}`);
       }
       const _ = await response.json();
       // console.log(deletedTask);
@@ -43,7 +43,7 @@ function TaskItem({ task, onTaskDeleted }) {
   };
 
   const handleUpdateTitle = async () => {
-    // Don't update task if empty or same as before
+    // Don't update task title if empty or same as before
     if (!title.trim() || title.trim() === latestTask.title) {
       setTitle(latestTask.title); // Return to original title
       return;
@@ -61,7 +61,7 @@ function TaskItem({ task, onTaskDeleted }) {
         }),
       });
       if (!response) {
-        throw new Error("Failed to update task title");
+        throw new Error(`Failed to update task title! Status: ${response.status}`);
       }
       const updatedTask = await response.json();
       // console.log(updatedTask);
@@ -82,6 +82,10 @@ function TaskItem({ task, onTaskDeleted }) {
   };
 
   const handleChangeStatus = (newStatus) => async () => {
+    // Don't update task status if same as before
+    if (newStatus === latestTask.status) {
+      return;
+    }
     try {
       setUpdating(true);
       setStatus(newStatus); // For immediate client-side response
@@ -95,7 +99,7 @@ function TaskItem({ task, onTaskDeleted }) {
         }),
       });
       if (!response) {
-        throw new Error("Failed to update task status");
+        throw new Error(`Failed to update task status! Status: ${response.status}`);
       }
       const updatedTask = await response.json();
       // console.log(updatedTask);

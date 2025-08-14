@@ -16,6 +16,9 @@ function TaskList({ selectedDate }) {
         const response = await fetch(
           `http://localhost:3000/tasks?date=${selectedDateString}`
         );
+        if (!response.ok) {
+          throw new Error(`Failed to retrieve tasks! Status: ${response.status}`);
+        }
         const data = await response.json();
         setTasks(data);
       } catch (error) {
@@ -35,6 +38,9 @@ function TaskList({ selectedDate }) {
       const response = await fetch(
         `http://localhost:3000/tasks?date=${selectedDateQuery}`
       );
+      if (!response.ok) {
+          throw new Error(`Failed to refresh tasks! Status: ${response.status}`);
+        }
       const data = await response.json();
       setTasks(data);
     } catch (error) {
