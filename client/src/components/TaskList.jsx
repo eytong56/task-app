@@ -44,8 +44,8 @@ function TaskList({ selectedDate }) {
     }
   };
 
-  if (loading) return <div>Loading Tasks...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div className="flex items-center text-xl font-semibold text-neutral-400">Loading Tasks...</div>;
+  if (error) return <div className="flex items-center text-xl font-semibold text-red-800">Error: {error}</div>;
 
   const taskItems = data.map((task) => {
     return <TaskItem key={task.id} task={task} onTaskDeleted={refreshTasks}/>;

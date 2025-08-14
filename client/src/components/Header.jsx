@@ -1,23 +1,28 @@
 import { useState, useEffect } from "react";
 import dates from "../constants/dates";
 import Warning from "./Warning";
+import JumpToToday from "./JumpToToday";
 
-function Header({ selectedDate }) {
+function Header({ selectedDate, setSelectedDate }) {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
+    let timer;
+
     const now = new Date();
     const secondsUntilNextMinute = 60 - now.getSeconds();
     const initialTimeout = setTimeout(() => {
       setCurrentTime(new Date());
 
-      const timer = setInterval(() => {
+      timer = setInterval(() => {
         setCurrentTime(new Date());
       }, 60000);
-      return clearInterval(timer);
     }, secondsUntilNextMinute * 1000);
 
-    return () => clearTimeout(initialTimeout);
+    return () => {
+      clearTimeout(initialTimeout);
+      timer && clearInterval(timer);
+    };
   }, []);
 
   function formatDate(date) {
@@ -42,12 +47,18 @@ function Header({ selectedDate }) {
         {formatDate(new Date())}
       </h2>
       {new Date().toDateString() !== selectedDate.toDateString() && (
-        <Warning>
-          Currently viewing{" "}
-          <span className="font-bold">
-            {formatDate(selectedDate)}, {selectedDate.getFullYear()}
-          </span>
-        </Warning>
+        <div className="flex flex-col items-center gap-3">
+          <Warning past={selectedDate < new Date()}>
+            Currently viewing{" "}
+            <span className="font-bold">
+              {formatDate(selectedDate)}, {selectedDate.getFullYear()}
+            </span>
+          </Warning>
+          <JumpToToday
+            past={selectedDate < new Date()}
+            setSelectedDate={setSelectedDate}
+          />
+        </div>
       )}
     </div>
   );
