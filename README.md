@@ -9,11 +9,11 @@ A simple daily task management app. Tasks are associated with a day, allowing yo
 ### Tech Stack
 **Frontend:** React (with Tailwind CSS)
 
-**Backend:** Node.js, Express.js, PostgreSQL
+**Backend:** Node.js, Express.js, PostgreSQL, JWT (Authentication)
 
 ### Current Features
 
-- Single user 
+- Account sign-up, login, logout
 - View current time and date
 - Create tasks for any day
 - Edit tasks
@@ -33,7 +33,7 @@ Use the npm package manager to install dependencies.
 npm install
 ```
 
-You will also need to add a `./server/.env` file with `PORT` and `DATABASE_URL` variables to run the server and establish the database connection.
+You will also need to add a `./server/.env` file with `PORT` and `DATABASE_URL` variables to run the server and establish the database connection, and a `./client/.env` file with `VITE_API_URL` to make API calls to your backend.
 
 Once your database is connected, use the following command to initialize and seed the database.
 ```bash
@@ -51,17 +51,17 @@ npm run client # run only client
 ## Next Steps
 
 ### General
-- Deploy!
+- [ ] Deploy!
 
 ### Backend
-- Create new `users` table in database
-- `users` API (create, edit user details, etc.)
-- Connect `users` table with `tasks` table via foreign key
-- Implement login, authentication, and authorization (passport.js)
+- [x] Create new `users` table in database
+- [x] `users` API (create, edit user details, etc.)
+- [x] Connect `users` table with `tasks` table via foreign key
+- [x] Implement login, authentication, and authorization (jwt)
 
 ### Frontend
-- Allow users to jump to specific dates (via calendar)
-- Explanatory tool tips that appear on hover
-- Dark mode
-- Expand status menu on hover, collapse otherwise
-- Login, sign-up, profile page to edit user details
+- [ ] Allow users to jump to specific dates (via calendar)
+- [ ] Explanatory tool tips that appear on hover
+- [ ] Dark mode
+- [ ] Expand status menu on hover, collapse otherwise
+- [ ] Login, sign-up, profile page to edit user details
