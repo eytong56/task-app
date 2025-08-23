@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import TaskItem from "./TaskItem";
 import NewTaskItem from "./NewTaskItem";
+import apiCall from "../../utils/api";
 
 function TaskList({ selectedDate }) {
   const [tasks, setTasks] = useState(null);
@@ -13,10 +14,7 @@ function TaskList({ selectedDate }) {
       try {
         setLoading(true);
         const selectedDateString = selectedDate.toISOString().split("T")[0];
-        const response = await fetch(
-          `http://localhost:3000/api/tasks?date=${selectedDateString}`,
-          { credentials: "include" }
-        );
+        const response = await apiCall(`/tasks?date=${selectedDateString}`);
         if (!response.ok) {
           throw new Error(
             `Failed to retrieve tasks! Status: ${response.status}`
@@ -38,10 +36,7 @@ function TaskList({ selectedDate }) {
     try {
       setLoading(true);
       const selectedDateQuery = selectedDate.toISOString().split("T")[0];
-      const response = await fetch(
-        `http://localhost:3000/api/tasks?date=${selectedDateQuery}`,
-        { credentials: "include" }
-      );
+      const response = await apiCall(`/tasks?date=${selectedDateQuery}`);
       if (!response.ok) {
         throw new Error(`Failed to refresh tasks! Status: ${response.status}`);
       }

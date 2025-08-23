@@ -4,6 +4,7 @@ import TaskList from "./tasks/TaskList.jsx";
 import LoginForm from "./LoginForm.jsx";
 import Logout from "./Logout.jsx";
 import SignupForm from "./SignupForm.jsx";
+import apiCall from "../utils/api.js";
 
 function Container({ selectedDate, setSelectedDate }) {
   const [user, setUser] = useState(null);
@@ -16,9 +17,7 @@ function Container({ selectedDate, setSelectedDate }) {
   useEffect(() => {
     const checkLogin = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/auth/me", {
-          credentials: "include",
-        });
+        const response = await apiCall("/auth/me");
         if (response.ok) {
           const authData = await response.json();
           setUser(authData.user);
@@ -40,14 +39,13 @@ function Container({ selectedDate, setSelectedDate }) {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/login", {
+      const response = await apiCall("/auth/login", {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ email, password }),
       });
+      console.log("Response object:", response); // Add this
+      console.log("Response type:", typeof response); // Add this
+      console.log("Response.json exists?", typeof response.json); // Add this
 
       if (response.ok) {
         const authData = await response.json();
@@ -67,14 +65,7 @@ function Container({ selectedDate, setSelectedDate }) {
 
   const logout = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
+      const response = await apiCall("/auth/logout", { method: "POST" });
       if (response.ok) {
         console.log("Logout success");
         setUser(null);
@@ -91,17 +82,12 @@ function Container({ selectedDate, setSelectedDate }) {
     }
   };
 
-  const register = async(email, password) => {
+  const register = async (email, password) => {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/register", {
+      const response = await apiCall("/auth/register", {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({ email, password }),
       });
-
       if (response.ok) {
         console.log("Registration success");
         setSignup(false);
@@ -116,13 +102,15 @@ function Container({ selectedDate, setSelectedDate }) {
       console.log(`Registration error: ${error}`);
       setError(error.message);
     }
-  }
+  };
 
   return (
     <div className="flex-grow flex flex-col items-center max-w-200 min-w-150 gap-10 py-24 px-24">
       <Header selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
       {error && <div className="text-red-800">Error: {error}</div>}
-      {success && <div className="text-emerald-800">Successfully {success}!</div>}
+      {success && (
+        <div className="text-emerald-800">Successfully {success}!</div>
+      )}
       {loading ? (
         <div>Loading...</div>
       ) : user ? (
@@ -131,9 +119,9 @@ function Container({ selectedDate, setSelectedDate }) {
           <Logout onLogout={logout} />
         </>
       ) : signup ? (
-        <SignupForm onRegister={register} onSwitch={() => setSignup(false)}/>
+        <SignupForm onRegister={register} onSwitch={() => setSignup(false)} />
       ) : (
-        <LoginForm onLogin={login} onSwitch={() => setSignup(true)}/>
+        <LoginForm onLogin={login} onSwitch={() => setSignup(true)} />
       )}
     </div>
   );

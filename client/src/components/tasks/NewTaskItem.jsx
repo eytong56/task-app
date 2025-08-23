@@ -1,5 +1,6 @@
 import { useState } from "react";
 import TaskItemContainer from "./TaskItemContainer";
+import apiCall from "../../utils/api";
 
 function NewTaskItem({ selectedDate, onTaskAdded }) {
   const [title, setTitle] = useState("");
@@ -19,18 +20,13 @@ function NewTaskItem({ selectedDate, onTaskAdded }) {
     try {
       setSubmitting(true);
       const selectedDateString = selectedDate.toISOString().split("T")[0];
-      const response = await fetch("http://localhost:3000/api/tasks", {
+      const response = await apiCall(`/tasks`, {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           title: title.trim(),
           date: selectedDateString,
         }),
       });
-
       if (!response) {
         throw new Error("Failed to create new task");
       }

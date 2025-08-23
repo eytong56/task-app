@@ -3,6 +3,7 @@ import TaskItemContainer from "./TaskItemContainer";
 import StatusMenu from "./StatusMenu";
 import STATUSES from "../../constants/statuses";
 import { X } from "lucide-react";
+import apiCall from "../../utils/api";
 
 function TaskItem({ task, onTaskDeleted }) {
   // console.log('TaskItem rendering for task:', task.id);
@@ -20,13 +21,7 @@ function TaskItem({ task, onTaskDeleted }) {
   const handleDelete = async () => {
     try {
       setDeleting(true);
-      const response = await fetch(`http://localhost:3000/api/tasks/${task.id}`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiCall(`/tasks/${task.id}`, { method: "DELETE" });
       if (!response) {
         throw new Error(`Failed to delete task! Status: ${response.status}`);
       }
@@ -49,21 +44,18 @@ function TaskItem({ task, onTaskDeleted }) {
       setTitle(latestTask.title); // Return to original title
       return;
     }
-
     try {
       setUpdating(true);
-      const response = await fetch(`http://localhost:3000/api/tasks/${task.id}`, {
+      const response = await apiCall(`/tasks/${task.id}`, {
         method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           title: title.trim(),
         }),
       });
       if (!response) {
-        throw new Error(`Failed to update task title! Status: ${response.status}`);
+        throw new Error(
+          `Failed to update task title! Status: ${response.status}`
+        );
       }
       const updatedTask = await response.json();
       // console.log(updatedTask);
@@ -91,18 +83,16 @@ function TaskItem({ task, onTaskDeleted }) {
     try {
       setUpdating(true);
       setStatus(newStatus); // For immediate client-side response
-      const response = await fetch(`http://localhost:3000/api/tasks/${task.id}`, {
+      const response = await apiCall(`/tasks/${task.id}`, {
         method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           status: newStatus,
         }),
       });
       if (!response) {
-        throw new Error(`Failed to update task status! Status: ${response.status}`);
+        throw new Error(
+          `Failed to update task status! Status: ${response.status}`
+        );
       }
       const updatedTask = await response.json();
       // console.log(updatedTask);
