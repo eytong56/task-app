@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
+import { motion } from "motion/react";
 
 function FormLabel({ name, type, label, value, setValue }) {
   const handleChange = (e) => {
@@ -24,18 +25,29 @@ function FormLabel({ name, type, label, value, setValue }) {
   );
 }
 
-function LoginForm({ onLogin, onSwitch }) {
+function Form({ onSubmit, onSwitch, switchText }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = () => {
-    console.log("Login form submitted");
-    onLogin(email, password);
+    console.log("Form submitted");
+    onSubmit(email, password);
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <div className="flex flex-col w-full items-start gap-3">
+    <motion.div
+      className="flex flex-col gap-6 w-full"
+      initial={{opacity: 0}}
+      animate={{opacity: 1}}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.1 }}
+    >
+      <motion.div
+        className="flex flex-col w-full items-start gap-3"
+        initial={{ opacity: 0, y: -6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2, duration: 1.2 }}
+      >
         <FormLabel
           name="email"
           type="email"
@@ -57,16 +69,19 @@ function LoginForm({ onLogin, onSwitch }) {
         >
           Login
         </button>
-      </div>
-      <button
+      </motion.div>
+      <motion.button
         onClick={onSwitch}
         className="cursor-pointer inline text-neutral-500 font-semibold underline underline-offset-4 hover:text-neutral-800 transition-colors duration-300"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6, duration: 0.8 }}
       >
-        Don't have an account? Sign up
+        {switchText}
         <ArrowUpRight className="inline w-5 h-5 align-bottom" />
-      </button>
-    </div>
+      </motion.button>
+    </motion.div>
   );
 }
 
-export default LoginForm;
+export default Form;

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import Header from "./header/Header.jsx";
 import TaskList from "./tasks/TaskList.jsx";
-import LoginForm from "./LoginForm.jsx";
+import Form from "./Form.jsx";
 import Logout from "./Logout.jsx";
-import SignupForm from "./SignupForm.jsx";
 import apiCall from "../utils/api.js";
+import { motion, AnimatePresence } from "motion/react";
 
 function Container({ selectedDate, setSelectedDate }) {
   const [user, setUser] = useState(null);
@@ -111,18 +111,30 @@ function Container({ selectedDate, setSelectedDate }) {
       {success && (
         <div className="text-emerald-800">Successfully {success}!</div>
       )}
-      {loading ? (
-        <div>Loading...</div>
-      ) : user ? (
-        <>
-          <TaskList selectedDate={selectedDate} />
-          <Logout onLogout={logout} />
-        </>
-      ) : signup ? (
-        <SignupForm onRegister={register} onSwitch={() => setSignup(false)} />
-      ) : (
-        <LoginForm onLogin={login} onSwitch={() => setSignup(true)} />
-      )}
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <div>Loading...</div>
+        ) : user ? (
+          <>
+            <TaskList selectedDate={selectedDate} />
+            <Logout onLogout={logout} />
+          </>
+        ) : signup ? (
+          <Form
+            key={signup ? "signup" : "login"}
+            onSubmit={register}
+            onSwitch={() => setSignup(false)}
+            switchText="Have an account? Login instead"
+          />
+        ) : (
+          <Form
+            key={signup ? "signup" : "login"}
+            onSubmit={login}
+            onSwitch={() => setSignup(true)}
+            switchText="Don't have an account? Sign up"
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
