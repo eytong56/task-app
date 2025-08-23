@@ -20,8 +20,9 @@ function TaskItem({ task, onTaskDeleted }) {
   const handleDelete = async () => {
     try {
       setDeleting(true);
-      const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+      const response = await fetch(`http://localhost:3000/api/tasks/${task.id}`, {
         method: "DELETE",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -51,8 +52,9 @@ function TaskItem({ task, onTaskDeleted }) {
 
     try {
       setUpdating(true);
-      const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+      const response = await fetch(`http://localhost:3000/api/tasks/${task.id}`, {
         method: "PUT",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -89,8 +91,9 @@ function TaskItem({ task, onTaskDeleted }) {
     try {
       setUpdating(true);
       setStatus(newStatus); // For immediate client-side response
-      const response = await fetch(`http://localhost:3000/tasks/${task.id}`, {
+      const response = await fetch(`http://localhost:3000/api/tasks/${task.id}`, {
         method: "PUT",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },

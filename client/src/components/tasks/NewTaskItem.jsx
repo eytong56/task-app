@@ -19,8 +19,9 @@ function NewTaskItem({ selectedDate, onTaskAdded }) {
     try {
       setSubmitting(true);
       const selectedDateString = selectedDate.toISOString().split("T")[0];
-      const response = await fetch("http://localhost:3000/tasks", {
+      const response = await fetch("http://localhost:3000/api/tasks", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },

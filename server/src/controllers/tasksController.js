@@ -2,6 +2,7 @@ import Task from "../models/Task.js";
 
 async function getAllTasks(req, res) {
   try {
+    const userId = req.user.userId;
     const filters = {};
     if (req.query.date) {
       filters.date = req.query.date;
@@ -10,38 +11,56 @@ async function getAllTasks(req, res) {
       filters.status = req.query.status;
     }
 
-    const tasks = await Task.getAllTasks(filters);
+    const tasks = await Task.getAllTasks(userId, filters);
     res.json(tasks);
-  } catch (error) {
-    res.status(500).json({ error: error.message});
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 }
 
 async function getTaskById(req, res) {
-  const task = await Task.getTaskById(req.params.id);
-  res.json(task);
+  try {
+    const taskId = req.params.id;
+    const userId = req.user.userId;
+    const task = await Task.getTaskById(taskId, userId);
+    if (!task) {
+      return res.status(404).json({ error: "Task not found" });
+    }
+    res.json(task);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 }
 
 async function createTask(req, res) {
-  const title = req.body.title;
-  const date = new Date(req.body.date).toISOString();
-  const task = await Task.createTask({ title, date });
-  res.json(task);
+  try {
+    const title = req.body.title;
+    const userId = req.user.userId;
+    const date = new Date(req.body.date).toISOString();
+    const task = await Task.createTask({ title, date }, userId);
+    res.status(201).json(task);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: err.message });
+  }
 }
 
 async function updateTask(req, res) {
   try {
+    const taskId = req.params.id;
+    const userId = req.user.userId;
     const statuses = ["pending", "in-progress", "completed", "pushed"];
 
     if (!req.body) {
-      return res
-        .status(400)
-        .json({
-          error: "Missing required fields. Must include title or status.",
-        });
+      return res.status(400).json({
+        error: "Missing required fields. Must include title or status.",
+      });
     }
     if (req.body.title !== undefined) {
-      await Task.updateTaskTitle(req.params.id, req.body.title);
+      const task = await Task.updateTaskTitle(taskId, req.body.title, userId);
+      if (!task) {
+        return res.status(404).json({ error: "Task not found" });
+      }
     }
     if (req.body.status !== undefined) {
       if (!statuses.includes(req.body.status)) {
@@ -49,27 +68,32 @@ async function updateTask(req, res) {
           error: `Invalid status. Must be one of ${statuses.join(", ")}`,
         });
       }
-      await Task.updateTaskStatus(req.params.id, req.body.status);
+      const task = await Task.updateTaskStatus(taskId, req.body.status, userId);
+      if (!task) {
+        return res.status(404).json({ error: "Task not found" });
+      }
     }
-    const updatedTask = await Task.getTaskById(req.params.id);
+    const updatedTask = await Task.getTaskById(taskId, userId);
     if (!updatedTask) {
       return res.status(404).json({ error: "Task not found" });
     }
     res.json(updatedTask);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 }
 
 async function deleteTask(req, res) {
   try {
-    const deletedTask = await Task.deleteTask(req.params.id);
+    const taskId = req.params.id;
+    const userId = req.user.userId;
+    const deletedTask = await Task.deleteTask(taskId, userId);
     if (!deletedTask) {
       return res.status(404).json({ error: "Task not found" });
     }
     res.json(deletedTask);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 }
 

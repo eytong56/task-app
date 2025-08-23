@@ -14,10 +14,13 @@ function TaskList({ selectedDate }) {
         setLoading(true);
         const selectedDateString = selectedDate.toISOString().split("T")[0];
         const response = await fetch(
-          `http://localhost:3000/tasks?date=${selectedDateString}`
+          `http://localhost:3000/api/tasks?date=${selectedDateString}`,
+          { credentials: "include" }
         );
         if (!response.ok) {
-          throw new Error(`Failed to retrieve tasks! Status: ${response.status}`);
+          throw new Error(
+            `Failed to retrieve tasks! Status: ${response.status}`
+          );
         }
         const data = await response.json();
         setTasks(data);
@@ -36,11 +39,12 @@ function TaskList({ selectedDate }) {
       setLoading(true);
       const selectedDateQuery = selectedDate.toISOString().split("T")[0];
       const response = await fetch(
-        `http://localhost:3000/tasks?date=${selectedDateQuery}`
+        `http://localhost:3000/api/tasks?date=${selectedDateQuery}`,
+        { credentials: "include" }
       );
       if (!response.ok) {
-          throw new Error(`Failed to refresh tasks! Status: ${response.status}`);
-        }
+        throw new Error(`Failed to refresh tasks! Status: ${response.status}`);
+      }
       const data = await response.json();
       setTasks(data);
     } catch (error) {

@@ -1,23 +1,37 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import taskRouter from "./routes/tasks.js"
+import cookieParser from "cookie-parser";
+import authRouter from "./routes/auth.js";
+import taskRouter from "./routes/tasks.js";
 
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send("Hello world!");
-});
+app.use(cookieParser());
 
 // Middleware
-app.use(cors({
-  origin: "http://localhost:5173" // Frontend URL
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:5173", // Frontend URL
+    credentials: true, // Allow cookies
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Logger
+// app.use((req, res, next) => {
+//   const start = Date.now();
+//   res.on("finish", () => {
+//     const duration = Date.now() - start;
+//     console.log(`${req.method} ${req.query.date ? req.query.date : ""} ${req.path} - ${duration}ms`);
+//   });
+//   next();
+// });
+
 // Routes
-app.use("/tasks", taskRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/tasks", taskRouter);
 
 // TODO: Error handling middleware
 
